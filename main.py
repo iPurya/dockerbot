@@ -9,6 +9,8 @@ from telebot.types import InlineKeyboardMarkup as newkb
 client = docker.from_env()
 bot = telebot.TeleBot(config.TOKEN)
 
+#TODO: add cpu memory usage
+
 @bot.callback_query_handler(func=lambda call: True)
 def callback_handler_function(call):
     data = call.data
@@ -19,9 +21,9 @@ def callback_handler_function(call):
         for container in client.containers.list():
             container.restart()
             bot.edit_message_text(f"Container <code>{container.name}</code> restarted!", chat_id, msg_id, reply_markup=None, parse_mode="HTML")
-            time.sleep(0.5)
 
         bot.edit_message_text("✅ All containers restarted successfully!", chat_id, msg_id, reply_markup=None)
+
     elif match := re.match(r"in:(.*)", data):
         container_id = match.group(1)
         #TODO: Show all info about container from `container.attrs`
@@ -29,7 +31,7 @@ def callback_handler_function(call):
         
 @bot.message_handler()
 def message_handler(msg):
-    #if not msg.chat.id == config.MANAGE_GP: return
+    if not msg.chat.id == config.MANAGE_GP: return
     text = str(msg.text)
     if re.match(r"/[Pp]s",text):
         txt = "Container lists :\n\n"
